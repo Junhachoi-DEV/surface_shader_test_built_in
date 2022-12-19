@@ -2,13 +2,19 @@ Shader "Custom/test_shader"
 {
     Properties
     {
+        /* 기본 쉐이더
         _Color ("Color", Color) = (1,1,1,1)
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _Metallic ("Metallic", Range(0,1)) = 0.0
+        */
+        
+        //fVal1 ("test_float",float) = 0.5 //이런식으로 추가할수 있다.
+        //fVal2 ("test_range",Range(0,2)) = 0.5
 
-        fVal1 ("test_float",float) = 0.5 //이런식으로 추가할수 있다.
-        fVal2 ("test_range",Range(0,2)) = 0.5
+        fR ("Red",Range(0,1)) = 1.0
+        fG ("Green",Range(0,1)) = 1.0
+        fB ("Bule",Range(0,1)) =1.0
     }
     SubShader
     {
@@ -29,9 +35,15 @@ Shader "Custom/test_shader"
             float2 uv_MainTex;
         };
 
-        half _Glossiness;
-        half _Metallic;
-        fixed4 _Color;
+        //있던거
+        //half _Glossiness;
+        //half _Metallic;
+        //fixed4 _Color;
+
+        float fR;
+        float fG;
+        float fB;
+
 
         // Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
         // See https://docs.unity3d.com/Manual/GPUInstancing.html for more information about instancing.
@@ -53,11 +65,12 @@ Shader "Custom/test_shader"
         };*/
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
-            float3 fR = float3(1, 0, 0);
+            /*float3 fR = float3(1, 0, 0);
             float3 fG = float3(0, 1, 0);
-            float3 fB = float3(0, 0, 1);
-
-            o.Emission = fR.rgb; // fR 에서 r=1 ,g=0, b=0
+            float3 fB = float3(0, 0, 1);*/
+            
+            o.Emission = float3(fR, fG, fB);
+            //o.Emission = fR.rgb; // fR 에서 r=1 ,g=0, b=0
             //o.Emission = fR + fG + fB;
         }
         ENDCG
