@@ -2,41 +2,44 @@ Shader "Custom/test_water"
 {
     Properties
     {
-        _MainTex("tex", 2D) = "White"{}
-        _CUBE("CubeMap", CUBE) = ""{}
+        _BumpMap("Normal Map", 2D) = "bump" {}
+        _Cube("Cube", Cube) = ""{}
+
+        [Space]
+        _Alpha("Alpha", Range(0, 1)) = 0.8
+        _Tiling("Normal Tiling", Range(1, 10)) = 1
+        _Strength("Normal Strength", Range(0, 2)) = 1
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
-        LOD 200
+        Tags { "RenderType" = "Transparent" "Queue" = "Transparent" }
 
         CGPROGRAM
-        // Physically based Standard lighting model, and enable shadows on all light types
-        #pragma surface surf Standard fullforwardshadows
-
-        // Use shader model 3.0 target, to get nicer looking lighting
+        #pragma surface surf Lambert alpha:fade
         #pragma target 3.0
 
-        sampler2D _MainTex;
-        samplerCUBE _CUBE;
+        sampler2D _BumpMap;
+        samplerCUBE _Cube;
+
         struct Input
         {
-            float2 uv_MainTex;
+            float2 uv_BumpMap;
             float3 worldRefl;
             INTERNAL_DATA
         };
 
-        
-        void surf (Input IN, inout SurfaceOutputStandard o)
-        {
-            
-            fixed4 c = tex2D(_MainTex, IN.uv_MainTex);
+        float _Alpha;
+        float _Tiling;
+        float _Strength;
 
-            float4 reflection = texCUBE(_CUBE, WorldReflectionVector(IN, o.Normal));
-            o.Emission = reflection;
-            o.Alpha = c.a;
+        void surf(Input IN, inout SurfaceOutput o)
+        {
+            float3 reflColor = texCUBE(_Cube, WorldReflectionVector(IN, o.Normal));
+            o.Normal = UnpackNormal(tex2D(_BumpMap, IN.uv_BumpMap * _Tiling)) * _Strength;
+            o.Emission = reflColor;
+            o.Alpha = _Alpha;
         }
         ENDCG
     }
-    FallBack "Diffuse"
+            FallBack "Legacy Shaders/Transparent/VertexLit"
 }
